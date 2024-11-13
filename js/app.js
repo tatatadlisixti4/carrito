@@ -11,7 +11,11 @@ let articulosCarrito = [];
 
 cargarEventListeners();
 function cargarEventListeners() {
+    // Evento boton "agregar al carrito"
     $$$(listaCursos, 'click', agregarCurso);
+
+    // Elimina cursos del carrito
+    $$$(carrito, 'click', eliminarCurso);
 }
 
 function agregarCurso(e) {
@@ -26,6 +30,26 @@ function agregarCurso(e) {
     }
 }
 
+function eliminarCurso(e) {
+    // Aplicaremos delegation para saber a que elemento del padre que desencadenó el evento le dimos click
+    if(e.target.classList.contains('borrar-curso')) {
+        const cursoId = e.target.getAttribute('data-id');
+        /*
+        - Map se usa para tener un arreglo en base a otro pero transformando cada elemento segun convenga, el tamaño de ambos arreglos es el mismo.
+
+        - Filter por otro lado, crea un nuevo arreglo en base a otro, pero si los elementos de este otro no cumplen un parametro, no lo toma para la cración. Esto implica que no siempre el tamaño de ambos arreglos sean el mismo
+
+        - Some verifica si al menos un elemento de un arreglo cumple una condicion y retorna un true o false
+        */
+
+        // Elimina del arreglo de articulosCarrito el id del data-id
+        articulosCarrito = articulosCarrito.filter(curso => curso.id !== cursoId); 
+        carritoHTML(); // Iterar sobre el carrito y mostrar su HTML
+        
+    }
+    
+}
+
 // Lee el contenido del HTML al que le dimos click y extrae la información del curso
 function leerDatosCurso(curso) {
 
@@ -37,11 +61,27 @@ function leerDatosCurso(curso) {
         id: ($$$$(curso, 'a')).getAttribute('data-id'), 
         cantidad: 1
     }
+    // Revisa si un elemento ya está en el carrito 
+    const existe = articulosCarrito.some(curso => curso.id === infoCurso.id)
+    if(existe) {
+        // Actualizamos la cantidad
+        const cursos = articulosCarrito.map( curso => {
+            if(curso.id === infoCurso.id) {
+                curso.cantidad++;
+                return curso; // Retorna el objeto actualizado
+            } else {
+                return curso; // Retorna los objetos que no se repitieron
+            }
+        });
+        articulosCarrito = [...cursos]; // Se le pasa una copia a articulos carrito sin afectar el array cursos
+    } else {
+        // Agrega elementos al arreglo de carrito
+        articulosCarrito = [...articulosCarrito, infoCurso];
 
-    // Agrega elementos al arreglo de carrito
-    articulosCarrito = [...articulosCarrito, infoCurso];
-    console.log(articulosCarrito);
-    carritoHTML()
+    }
+    // console.log(articulosCarrito);
+    carritoHTML();
+    
 }
 
 
@@ -50,10 +90,10 @@ function carritoHTML() {
 
     // Limpiar el HTML para evitar volver agregar un curso.
     limpiarHTML();
-
+    
     // Recorre el carrito y genera el HTML
     articulosCarrito.forEach(curso => {
-        {imagen, titulo, precio, cantidad, id}
+        const {imagen, titulo, precio, id, cantidad} = curso;
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
@@ -65,9 +105,7 @@ function carritoHTML() {
             <td> 
                 <a href="#" class="borrar-curso" data-id="${id}" > X </a>
             </td>
-
         `;
-
         // Agrega el HTML del carrito en el tbody
         contenedorCarrito.appendChild(row);
     });
