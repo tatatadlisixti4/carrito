@@ -9,13 +9,22 @@ const vaciarCarritoBtn = $('#vaciar-carrito');
 const listaCursos = $('#lista-cursos');
 let articulosCarrito = [];
 
-cargarEventListeners();
+cargarEventListeners(); // Se declara primero para agilizar el entendimiento de la logica del codigo y se invocar antes de su declaracion pq son funciones declaradas y no asignadas. Js tiene 2 fases, la de hosting que es en donde se reordena el codigo manteniendo primero las variables y funciones expresamente declaradas y dps la fase de ejecucion en donde ocurre linea por linea lo que indica su nombre (ejecutar).
 function cargarEventListeners() {
     // Evento boton "agregar al carrito"
     $$$(listaCursos, 'click', agregarCurso);
 
     // Elimina cursos del carrito
     $$$(carrito, 'click', eliminarCurso);
+
+    // Vaciar el carrito 
+    $$$(vaciarCarritoBtn, 'click', () => {
+        console.log('Vaciando');
+        articulosCarrito = [];  // Se resetea el arreglo del carrito
+        limpiarHTML(); // Eliminamos el HTML del carrito
+
+    });
+
 }
 
 function agregarCurso(e) {
@@ -80,10 +89,8 @@ function leerDatosCurso(curso) {
 
     }
     // console.log(articulosCarrito);
-    carritoHTML();
-    
+    carritoHTML(); 
 }
-
 
 // Muestra el carrito de compras en el html
 function carritoHTML() {
