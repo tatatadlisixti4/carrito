@@ -12,7 +12,9 @@ function cargarEventListeners() {
     $$$(listaCursos, 'click', agregarCurso);
 }
 
-function agregarCurso() {
-    console.log('Presionando en cursos');
-    
+function agregarCurso(e) {
+    e.preventDefault();
+    if(e.target.classList.contains('agregar-carrito')) {
+        console.log(e.target);
+    }
 }
